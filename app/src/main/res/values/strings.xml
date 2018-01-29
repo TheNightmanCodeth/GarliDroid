@@ -5,4 +5,5 @@
     <!-- Wallet Dialog -->
     <string name="wallet_prompt">Wallet address</string>
     <string name="wallet_dialog_title">Add wallet</string>
+    <string name="wallet_name">Wallet name</string>
 </resources>
