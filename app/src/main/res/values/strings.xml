@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GarliDroid</string>
+    <string name="title_activity_wallets">Wallets</string>
+
+    <!-- Wallet Dialog -->
+    <string name="wallet_prompt">Wallet address</string>
+    <string name="wallet_dialog_title">Add wallet</string>
+</resources>
