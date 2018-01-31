@@ -5,15 +5,23 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.wallet_list_item.view.*
+import kotlinx.android.synthetic.main.wallet_list_item.view.list_root
 import me.thenightmancodeth.garlidroid.Model.Wallet
+import me.thenightmancodeth.garlidroid.Retrofit.GrlcService
 
 /**
  * Created by joe on 1/28/18.
  */
-class RealmRVAdapter(context: Context, wallets: OrderedRealmCollection<Wallet>) : RealmRecyclerViewAdapter<Wallet, RealmRVAdapter.WalletListViewHolder>(context, wallets, true) {
+class RealmRVAdapter(context: Context, wallets: OrderedRealmCollection<Wallet>, val deleteListener: (Wallet) -> Unit) : RealmRecyclerViewAdapter<Wallet, RealmRVAdapter.WalletListViewHolder>(context, wallets, true) {
+
+    private val grlcApiServe by lazy {
+        GrlcService.create()
+    }
 
     override fun onCreateViewHolder(p0: ViewGroup?, p1: Int): WalletListViewHolder{
         val listItem: View = LayoutInflater.from(p0?.context).inflate(R.layout.wallet_list_item, p0, false)
@@ -22,8 +30,20 @@ class RealmRVAdapter(context: Context, wallets: OrderedRealmCollection<Wallet>) 
 
     override fun onBindViewHolder(p0: WalletListViewHolder?, p1: Int) {
         val wallet = data!![p1]
-        p0!!.itemView.addrText.text = wallet.address
-        p0.itemView.addrBalance.text = wallet.balance
+        grlcApiServe.getAddressDetails(wallet.address)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { result ->
+                            p0!!.itemView.titleText.text = wallet.title
+                            p0.itemView.addrText.text = wallet.address
+                            p0.itemView.addrBalance.text = "${result.balance} GRLC"
+                        }
+                )
+        p0?.itemView?.list_root?.setOnLongClickListener {
+            deleteListener(wallet)
+            true
+        }
     }
 
     class WalletListViewHolder(view: View) : RecyclerView.ViewHolder(view)
