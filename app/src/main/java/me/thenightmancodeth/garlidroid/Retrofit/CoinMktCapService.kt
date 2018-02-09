@@ -2,28 +2,28 @@ package me.thenightmancodeth.garlidroid.Retrofit
 
 import io.reactivex.Observable
 import me.thenightmancodeth.garlidroid.Model.Address
+import me.thenightmancodeth.garlidroid.Model.CoinMarketCap
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Path
 
 /**
- * Created by joe on 1/28/18.
+ * Created by joe on 2/9/18.
  */
-interface GrlcService {
-    @GET("ext/getaddress/{addr}")
-    fun getAddressDetails(@Path("addr") addr: String): Observable<Address>
+interface CoinMktCapService {
+    @GET("ticker/garlicoin")
+    fun getUSDPrice(): Observable<List<CoinMarketCap>>
 
     companion object {
-        fun create(): GrlcService {
+        fun create(): CoinMktCapService {
             val retrofit = Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl("https://explorer.grlc-bakery.fun/")
+                    .baseUrl("https://api.coinmarketcap.com/v1/")
                     .build()
 
-            return retrofit.create(GrlcService::class.java)
+            return retrofit.create(CoinMktCapService::class.java)
         }
     }
 }
